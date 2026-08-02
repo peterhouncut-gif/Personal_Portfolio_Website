@@ -1,138 +1,45 @@
-import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { projects } from '@/data/projects'
-import type { Project } from '@/data/projects'
-import { ProjectCard } from '@/components/ui/ProjectCard'
 
-/* ── Filter configuration ────────────────────────────── */
-type FilterKey = 'all' | Project['category']
+const fadeIn = (delay = 0) => ({
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: 'easeOut' } },
+})
 
-const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'frontend', label: 'Frontend' },
-  { key: 'backend', label: 'Backend' },
-  { key: 'fullstack', label: 'Full Stack' },
-]
-
-/* ── Animation variants ──────────────────────────────── */
-const heading = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-}
-
-/* ── Component ───────────────────────────────────────── */
 export function Projects() {
-  const [activeFilter, setActiveFilter] = useState<FilterKey>('all')
-
-  const filtered = useMemo<Project[]>(() => {
-    if (activeFilter === 'all') return projects
-    return projects.filter((p) => p.category === activeFilter)
-  }, [activeFilter])
-
   return (
-    <section id="projects" className="px-6 py-24 max-w-6xl mx-auto">
-      {/* ── Section heading ─────────────────────────── */}
-      <motion.div
-        className="mb-14 text-center"
-        variants={heading}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true }}
-      >
-        <h2 className="text-3xl font-bold tracking-tight text-[#FFFFFF] sm:text-4xl">
-          Featured Projects
-        </h2>
-        <p className="mt-3 text-sm text-[#E0E0E0]/45 sm:text-base">
-          A selection of work I&rsquo;ve built recently
-        </p>
+    <section id="work" className="px-6 py-24 max-w-4xl mx-auto">
+      <motion.div className="mb-14 text-center" variants={fadeIn()} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <h2 className="text-3xl font-bold tracking-tight text-[#FFFDF7] sm:text-4xl">代表性实践</h2>
+        <p className="mt-3 text-sm text-[#F5E6D3]/45 sm:text-base">行业经验 × 技术方案 × AI 探索</p>
       </motion.div>
 
-      {/* ── Filter pills ────────────────────────────── */}
-      <motion.div
-        className="mb-12 flex flex-wrap items-center justify-center gap-2"
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-        role="tablist"
-        aria-label="Filter projects by category"
-      >
-        {FILTERS.map((f) => {
-          const isActive = activeFilter === f.key
-          return (
-            <button
-              key={f.key}
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setActiveFilter(f.key)}
-              className={[
-                'relative rounded-full px-5 py-2 text-sm font-medium transition-all duration-300',
-                isActive
-                  ? 'text-[#FFFFFF]'
-                  : 'text-[#E0E0E0]/50 hover:text-[#E0E0E0]/80',
-              ].join(' ')}
-            >
-              {/* Active pill background */}
-              {isActive && (
-                <motion.span
-                  layoutId="activeFilter"
-                  className="absolute inset-0 rounded-full gradient-accent"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-              <span className="relative z-10">{f.label}</span>
-            </button>
-          )
-        })}
-      </motion.div>
-
-      {/* ── Project grid ────────────────────────────── */}
-      <AnimatePresence mode="wait">
-        {filtered.length > 0 ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {projects.map((p, i) => (
           <motion.div
-            key={activeFilter}
-            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            key={p.id}
+            className="group rounded-2xl border border-[#F5E6D3]/6 bg-[#F5E6D3]/3 p-6 backdrop-blur-sm hover:border-[#F4976C]/20 hover:bg-[#F4976C]/6 transition-all duration-300"
+            variants={fadeIn(0.1 + i * 0.05)}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            whileHover={{ y: -4 }}
           >
-            {filtered.map((project, i) => (
-              <ProjectCard key={project.id} project={project} index={i} />
-            ))}
+            <p className="text-[10px] font-medium tracking-[0.15em] text-[#FFD166]/60 uppercase mb-3">{p.category}</p>
+            <h3 className="text-base font-semibold text-[#FFFDF7]">{p.title}</h3>
+            <p className="mt-2 text-sm text-[#F5E6D3]/55 leading-relaxed">{p.description}</p>
+            {p.impact && <p className="mt-3 text-xs text-[#FFD166]/50 italic">✦ {p.impact}</p>}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {p.techStack.map((t) => (
+                <span key={t} className="rounded-full border border-[#F4976C]/10 bg-[#F4976C]/8 px-2.5 py-1 text-[10px] text-[#FFD166]/70">{t}</span>
+              ))}
+            </div>
           </motion.div>
-        ) : (
-          /* ── Empty state ─────────────────────────── */
-          <motion.div
-            key="empty"
-            className="flex flex-col items-center gap-4 py-20 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <span className="text-5xl select-none opacity-20">📭</span>
-            <p className="text-sm text-[#E0E0E0]/40">
-              No projects found in this category.
-            </p>
-            <button
-              onClick={() => setActiveFilter('all')}
-              className="text-sm font-medium text-[#6366f1] hover:underline"
-            >
-              Show all projects
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        ))}
+      </div>
 
-      {/* ── Project count ───────────────────────────── */}
-      <motion.p
-        className="mt-10 text-center text-xs text-[#E0E0E0]/25"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.5 }}
-      >
-        Showing {filtered.length} of {projects.length} projects
+      <motion.p className="mt-10 text-center text-xs text-[#F5E6D3]/20" variants={fadeIn(0.5)} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        共 {projects.length} 项实践
       </motion.p>
     </section>
   )

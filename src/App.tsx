@@ -7,7 +7,7 @@ import { Contact } from '@/components/sections/Contact'
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#121212] text-[#E0E0E0]">
+    <div className="min-h-screen bg-[#1a1412] text-[#F5E6D3]">
       <Header />
       <main>
         <Hero />
