@@ -19,3 +19,4 @@ Once your project structure is established, this file should contain concrete co
 - 删除文件夹必须使用 `rd /s /q`，禁止使用 `rm -rf`
 - 文件路径优先使用正斜杠 `/`，避免反斜杠转义问题
 - 链式命令使用 `;` 或 `&&` 时必须符合 Windows 语法
+
